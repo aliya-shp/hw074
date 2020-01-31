@@ -3,12 +3,20 @@ const fs = require('fs');
 
 const router = express.Router();
 
-const date = (new Date()).toISOString();
+const path = './messages';
 
-const fileName = `./messages/${date}.txt`;
+const data = [];
 
 router.get('/', (req, res) => {
-    res.send('List of messages');
+    const files = fs.readdirSync(path).forEach(file => {
+        const fileContent = fs.readFileSync(path + '/' + file, 'utf8');
+        data.push(JSON.parse(fileContent));
+    });
+    const result = data.slice(1).slice(-5);
+    console.log(data);
+    console.log(result);
+
+    res.send(result);
 });
 
 router.get('/:id', (req, res) => {
@@ -16,11 +24,14 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
+    const date = (new Date()).toISOString();
+    const fileName = `./messages/${date}.txt`;
     const message = {
         message: req.body.message,
         dateTime: date
     };
-    fs.writeFileSync(fileName, req.body.message);
+    const strMessage = JSON.stringify(message);
+    fs.writeFileSync(fileName, strMessage);
     res.send(message);
 });
 
