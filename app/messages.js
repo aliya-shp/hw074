@@ -8,14 +8,15 @@ const path = './messages';
 const data = [];
 
 router.get('/', (req, res) => {
-    const files = fs.readdirSync(path).forEach(file => {
-        const fileContent = fs.readFileSync(path + '/' + file, 'utf8');
-        data.push(JSON.parse(fileContent));
+    const files = fs.readdir(path, (err, files) => {
+        files.forEach(file => {
+            fs.readFile(path + '/' + file, (err, fileContent) => {
+                if (err) throw err;
+                data.push(JSON.parse(fileContent));
+            })
+        })
     });
     const result = data.slice(1).slice(-5);
-    console.log(data);
-    console.log(result);
-
     res.send(result);
 });
 
@@ -31,7 +32,9 @@ router.post('/', (req, res) => {
         dateTime: date
     };
     const strMessage = JSON.stringify(message);
-    fs.writeFileSync(fileName, strMessage);
+    fs.writeFile(fileName, strMessage, 'utf8',(err) => {
+        if (err) throw err;
+    });
     res.send(message);
 });
 
