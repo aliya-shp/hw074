@@ -8,16 +8,11 @@ const path = './messages';
 const data = [];
 
 router.get('/', (req, res) => {
-    const files = fs.readdir(path, (err, files) => {
-        files.forEach(file => {
-            fs.readFile(path + '/' + file, (err, files) => {
-                if (err) throw err;
-                data.push(JSON.parse(files));
-            })
-        })
+    const files = fs.readdirSync(path).forEach(file => {
+        const fileContent = fs.readFileSync(path + '/' + file, 'utf8');
+        data.push(JSON.parse(fileContent));
     });
     const result = data.slice(1).slice(-5);
-    console.log(result);
     res.send(result);
 });
 
